@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彼のスイッチ診断</title>
+<style>
+:root{
+  --pink:#f472b6;--pink-l:#fce7f3;--pink-m:#fbcfe8;
+  --purple:#a855f7;--purple-l:#f3e8ff;
+  --grad:linear-gradient(135deg,#f472b6,#a855f7);
+  --grad-soft:linear-gradient(135deg,#fce7f3,#f3e8ff);
+  --text:#3b0764;--sub:#7e22ce;--gray:#6b7280;
+  --shadow:0 4px 24px rgba(168,85,247,.12);--r:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:linear-gradient(160deg,#fdf2f8 0%,#f5f3ff 100%);min-height:100vh;color:var(--text);}
+
+.hero{background:var(--grad);padding:52px 24px 44px;text-align:center;position:relative;overflow:hidden;}
+.hero::before,.hero::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.08);}
+.hero::before{width:220px;height:220px;top:-70px;right:-60px;}
+.hero::after{width:160px;height:160px;bottom:-50px;left:-50px;}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.22);color:#fff;font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 16px;border-radius:20px;margin-bottom:16px;}
+.hero h1{color:#fff;font-size:clamp(22px,6vw,32px);font-weight:900;line-height:1.35;margin-bottom:10px;position:relative;z-index:1;}
+.hero h1 span{display:block;font-size:clamp(13px,3.5vw,16px);font-weight:600;opacity:.88;margin-bottom:4px;}
+.hero-sub{color:rgba(255,255,255,.88);font-size:13px;line-height:1.7;position:relative;z-index:1;}
+.hero-icons{font-size:24px;letter-spacing:8px;margin-bottom:14px;position:relative;z-index:1;}
+
+.wrap{max-width:480px;margin:0 auto;padding:28px 16px 70px;}
+.card{background:#fff;border-radius:var(--r);padding:26px 22px;box-shadow:var(--shadow);margin-bottom:14px;}
+.card-accent{border-left:4px solid var(--pink);}
+.card h2{font-size:15px;font-weight:800;color:var(--pink);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.card p{font-size:13.5px;line-height:1.9;color:#555;}
+.card p strong{color:var(--purple);}
+
+.btn-main{display:block;width:100%;padding:17px;background:var(--grad);color:#fff;font-size:16px;font-weight:800;border:none;border-radius:50px;cursor:pointer;box-shadow:0 4px 18px rgba(244,114,182,.35);letter-spacing:.04em;transition:transform .15s,box-shadow .15s;margin-top:22px;text-align:center;}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(244,114,182,.45);}
+.btn-sub{display:block;width:100%;padding:14px;background:transparent;color:var(--sub);font-size:14px;font-weight:700;border:2px solid var(--pink-m);border-radius:50px;cursor:pointer;text-align:center;margin-top:10px;transition:background .15s;}
+.btn-sub:hover{background:var(--pink-l);}
+
+.prog-wrap{margin-bottom:20px;}
+.prog-info{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);font-weight:700;margin-bottom:8px;}
+.prog-bar{height:6px;background:var(--pink-m);border-radius:10px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--grad);border-radius:10px;transition:width .4s ease;}
+
+.q-num{font-size:11px;color:var(--pink);font-weight:800;letter-spacing:.1em;margin-bottom:8px;}
+.q-text{font-size:16px;font-weight:800;line-height:1.55;margin-bottom:22px;}
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{width:100%;padding:14px 18px;background:var(--pink-l);border:2px solid transparent;border-radius:14px;text-align:left;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all .18s;line-height:1.5;}
+.opt:hover{border-color:var(--pink);background:var(--pink-m);transform:translateX(4px);}
+.opt.sel{border-color:var(--purple);background:var(--purple-l);color:var(--sub);}
+.opt-lbl{display:inline-block;background:var(--grad);color:#fff;font-size:11px;font-weight:800;border-radius:6px;padding:1px 7px;margin-right:8px;vertical-align:middle;}
+
+.btn-next{display:block;width:100%;padding:15px;background:var(--grad);color:#fff;font-size:15px;font-weight:800;border:none;border-radius:50px;cursor:pointer;box-shadow:0 4px 16px rgba(244,114,182,.3);transition:opacity .3s,transform .15s;margin-top:6px;}
+.btn-next:hover{transform:translateY(-2px);}
+
+.r-hero{text-align:center;margin-bottom:24px;}
+.r-hero p{font-size:12px;color:var(--sub);font-weight:700;letter-spacing:.08em;margin-bottom:6px;}
+.r-emoji{font-size:56px;display:block;margin:12px 0 8px;}
+.r-switch{display:inline-block;background:rgba(168,85,247,.1);color:var(--purple);font-size:12px;font-weight:800;padding:4px 14px;border-radius:20px;margin-bottom:8px;letter-spacing:.06em;}
+.r-type{font-size:clamp(24px,7vw,34px);font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.3;}
+
+.r-section h3{font-size:13px;font-weight:800;color:var(--pink);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.r-section p{font-size:14px;line-height:1.9;color:#555;}
+.r-section p strong{color:var(--purple);}
+
+.todo-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+.todo-list li{background:var(--grad-soft);border-radius:12px;padding:13px 16px;font-size:14px;line-height:1.6;color:var(--text);display:flex;gap:10px;align-items:flex-start;}
+.todo-num{flex-shrink:0;width:22px;height:22px;background:var(--grad);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:1px;}
+
+.msg-card{background:var(--grad);border-radius:var(--r);padding:26px 22px;margin-bottom:14px;color:#fff;}
+.msg-card h3{font-size:15px;font-weight:800;margin-bottom:12px;}
+.msg-card p{font-size:14px;line-height:1.9;opacity:.96;}
+
+.article-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:18px 20px;background:var(--grad);color:#fff;font-size:14px;font-weight:800;border:none;border-radius:16px;cursor:pointer;box-shadow:0 4px 16px rgba(244,114,182,.3);margin-bottom:6px;text-decoration:none;transition:transform .15s,box-shadow .15s;line-height:1.45;text-align:left;gap:12px;}
+.article-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(244,114,182,.42);}
+.article-btn .arr{flex-shrink:0;font-size:18px;}
+.article-note{font-size:12px;color:var(--gray);text-align:center;margin-bottom:14px;}
+
+.all-types{background:#fff;border-radius:var(--r);padding:24px 22px;box-shadow:var(--shadow);margin-bottom:14px;}
+.all-types h3{font-size:14px;font-weight:800;color:var(--text);margin-bottom:16px;text-align:center;line-height:1.5;}
+.type-grid{display:flex;flex-direction:column;gap:10px;}
+.type-item{display:flex;align-items:center;background:var(--grad-soft);border-radius:14px;padding:13px 16px;gap:12px;text-decoration:none;color:var(--text);transition:transform .15s,box-shadow .15s;border:2px solid transparent;}
+.type-item:hover{transform:translateX(4px);border-color:var(--pink-m);}
+.type-item.current{border-color:var(--pink);background:var(--pink-l);}
+.type-icon{font-size:28px;flex-shrink:0;}
+.type-body{flex:1;min-width:0;}
+.type-name{font-size:14px;font-weight:800;color:var(--sub);margin-bottom:2px;}
+.type-sw{font-size:12px;color:var(--gray);margin-bottom:4px;}
+.type-action{font-size:12px;font-weight:700;color:var(--pink);}
+.type-arr{flex-shrink:0;color:var(--purple);font-size:16px;}
+.cur-badge{display:inline-block;background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;margin-left:6px;vertical-align:middle;}
+
+.common-card{background:#fff;border-radius:var(--r);padding:26px 22px;box-shadow:var(--shadow);margin-bottom:14px;text-align:center;border-top:4px solid var(--pink);}
+.common-card h3{font-size:16px;font-weight:900;line-height:1.5;margin-bottom:14px;}
+.common-card p{font-size:14px;line-height:1.9;color:#555;margin-bottom:8px;}
+.common-card .big{font-size:15px;font-weight:800;color:var(--purple);line-height:1.65;margin:14px 0;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .4s ease both;}
+footer{text-align:center;padding:16px;font-size:11px;color:#bbb;}
+</style>
+</head>
+<body>
+
+<!-- HERO（常に表示） -->
+<div class="hero">
+  <div class="hero-badge">💕 恋愛心理診断</div>
+  <div class="hero-icons">🔍 💜 ✨</div>
+  <h1><span>今この瞬間、</span>彼のスイッチ診断</h1>
+  <p class="hero-sub">彼の恋愛スイッチは今どこにある？<br>男性心理から読む10の質問</p>
+</div>
+
+<!-- ▼ START（初期表示） -->
+<div id="start-screen" class="wrap">
+  <div class="card card-accent">
+    <h2>📌 この診断でわかること</h2>
+    <p>
+      「なんで最近こうなんだろう？」<br><br>
+      彼の態度や連絡の変化にモヤモヤしていませんか？<br><br>
+      実は、男性の行動は<strong>「あなたへの気持ちの温度」より「今の彼の状態」</strong>で変わることの方が多いんです。<br><br>
+      この診断では、今この瞬間の彼の内側にあるスイッチを読み解いて<strong>「あなたが今すべきこと」</strong>をお伝えします。<br><br>
+      全10問、正直に答えてみてください💕
+    </p>
+    <button class="btn-main" id="start-btn">診断スタート ✨</button>
+  </div>
+</div>
+
+<!-- ▼ QUIZ（初期非表示） -->
+<div id="quiz-screen" class="wrap" style="display:none;">
+  <div class="prog-wrap">
+    <div class="prog-info">
+      <span id="q-counter">Q1 / 10</span>
+      <span id="q-pct">0%</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="card fu" id="q-card">
+    <div class="q-num" id="q-num">QUESTION 01</div>
+    <div class="q-text" id="q-text"></div>
+    <div class="opts" id="opts"></div>
+  </div>
+  <button class="btn-next" id="btn-next" style="display:none;">次の質問へ →</button>
+</div>
+
+<!-- ▼ RESULT（初期非表示） -->
+<div id="result-screen" class="wrap" style="display:none;">
+  <div class="r-hero fu">
+    <p>あなたの彼は…</p>
+    <span class="r-emoji" id="r-emoji"></span>
+    <div class="r-switch" id="r-switch"></div>
+    <div class="r-type" id="r-type"></div>
+  </div>
+  <div class="card r-section fu">
+    <h3>🧠 彼の心理</h3>
+    <p id="r-psychology"></p>
+  </div>
+  <div class="card r-section fu">
+    <h3>💡 今のあなたがやること</h3>
+    <ul class="todo-list" id="r-todo"></ul>
+  </div>
+  <a class="article-btn fu" id="r-article-btn" href="#" target="_blank">
+    <span id="r-article-label"></span>
+    <span class="arr">→</span>
+  </a>
+  <p class="article-note">↑ 詳しい方法を記事で解説しています</p>
+  <div class="msg-card fu">
+    <h3>🫶 あこからあなたへ</h3>
+    <p id="r-msg"></p>
+  </div>
+  <div class="common-card fu">
+    <h3>💗 どのタイプでも、<br>伝えたいことは一つです</h3>
+    <p>彼の態度が変わったのは<br><strong>あなたへの気持ちが変わったからじゃない。</strong></p>
+    <p class="big">「今の彼の状態」が<br>変わっただけです。</p>
+    <p>今の彼に合わせた動き方をするだけで、<br>関係は必ず動きます。<br><br>あなたにはその力が、ちゃんとあります💕</p>
+  </div>
+  <div class="all-types fu">
+    <h3>📚 他のタイプの詳細記事も<br>読んでみませんか？</h3>
+    <div class="type-grid" id="type-grid"></div>
+  </div>
+  <button class="btn-sub" id="retry-btn">🔄 もう一度診断する</button>
+</div>
+
+<footer>© あこ | 男が沼る恋愛心理学スキル</footer>
+
+<script>
+var Qs=[
+  {text:"最近の彼の仕事や生活の様子は？",opts:["忙しいけど充実してそう、頑張っている感じがする","普通だけど、なんとなく慎重な様子がある","かなり忙しくて、余裕がなさそう","特に忙しくはないが、なんとなくだらっとしている"]},
+  {text:"彼が一番よく話してくれる話題は？",opts:["自分の仕事・夢・うまくいったこと","2人のこと、あなたの日常や気持ち","あまり話す機会がない","特に変わり映えしない日常の出来事"]},
+  {text:"彼から連絡が来るのはどんなタイミング？",opts:["自分の近況を報告したい時","あなたの様子を確認したい時","必要な用件がある時だけ","なんとなく暇な時・気が向いた時"]},
+  {text:"最近のデートや会う時の雰囲気は？",opts:["彼が話す時間が多く、あなたが聞き役になりがち","お互いを探り合うような、少し緊張感がある","デートが減った、またはドタキャンが増えた","安定しているが、最初の頃より新鮮さが薄れてきた"]},
+  {text:"彼があなたに見せることが多い「顔」は？",opts:["頑張っている自分・うまくいっている自分","慎重で、あまり弱みを見せない","疲れた顔・ため息・余裕のない様子","いつも通りで、特に変化がない"]},
+  {text:"彼が最近、うれしそうにしていた瞬間は？",opts:["仕事や趣味でうまくいった時・誰かに認められた時","あなたが誠実な行動をした時・約束を守った時","久しぶりにゆっくり休めた時","いつもと違うことをした時・サプライズがあった時"]},
+  {text:"彼の返信や連絡の、最近の変化は？",opts:["自分の話をしたい時だけ早い","気まぐれだが、大事なことにはちゃんと反応する","全体的に遅くなってきた","以前より落ち着いていて、熱量が下がった感じ"]},
+  {text:"彼はあなたに何を求めているように感じる？",opts:["自分を認めてほしい・話を聞いてほしい","信頼できる人かどうかを見ている感じ","よくわからない、それどころじゃない感じ","何か面白いことや刺激がほしそう"]},
+  {text:"2人の間で最近起きている変化といえば？",opts:["彼が少し自信をなくしているような気がする","お互いの距離感を確認し合っている段階な気がする","彼の忙しさが2人の関係に影響している","付き合い始めの頃より、空気が落ち着いてきた"]},
+  {text:"今の2人の関係で、あなたが一番感じていることは？",opts:["彼にもっと自信を持ってほしいと感じる","まだお互いを探り合っている、次のステップが見えない","彼が忙しすぎて、自分まで余裕がなくなってきた","なんとなく安定しすぎて、少し物足りない"]}
+];
+
+var Rs=[
+  {emoji:"🔥",sw:"安心を求めている",type:"輝きたい彼",
+   psych:"今の彼は「自分を認めてくれる場所」を無意識に求めています。仕事やプライドにプレッシャーを感じていて、あなたとの時間に安心感を求めているサインです。あなたへの気持ちがないのではなく、「ここにいると自分でいられる」と感じたくてあなたのそばにいます。",
+   todo:["彼の話を、評価せずにただ聞く。「そうなんだ」「大変だったね」の相槌だけで十分。","小さな頑張りを言葉で認める。「すごいじゃん」「ちゃんと見てたよ」のひと言が効く。","「あなたといると楽しい」を自然に伝える。居心地の良さを感じさせることが最優先。"],
+   msg:"彼が自分の話ばかりするのは、あなたを軽く見ているのではなく、あなたのことを信頼しているから。彼のタンクが満たされれば、必ずあなたに返ってきます。それが、男性という生き物の仕組みです💕",
+   label:"「認めてほしい男」に長く愛される女性がやっていること",url:"https://note.com/preview/n93e92b3b9d1f?prev_access_key=cb4f440ff1841f86013cc1d3147f7ce8"},
+  {emoji:"🔍",sw:"信頼を確かめている",type:"確認中の彼",
+   psych:"今の彼は本気になる、一歩手前にいます。あなたのことが気になっているからこそ、「信頼できる人かどうか」を言葉ではなく行動で確かめています。試しているのではなく、大切にする前に慎重になっているだけ。これは本気になりかけているサインです。",
+   todo:["小さな約束を必ず守る。大きな約束より、ささいな約束を守る人が信頼される。","感情的にならず、一貫した態度でいる。ブレない自分が彼の安心につながる。","自分の軸を持っている姿を見せる。「この人には自分の世界がある」と感じさせることが大切。"],
+   msg:"彼が慎重なのは、それだけ本気になりかけているから。どうでもいい相手に、こんなに慎重にはなりません。今のあなたに必要なのは、「信頼できる人だ」という証拠を行動で積み重ねること。それだけで彼のスイッチは必ず入ります💕",
+   label:"「慎重な彼」が本命モードに入る瞬間と、そのスイッチの入れ方",url:"https://note.com/preview/n67e2c6f7b34c?prev_access_key=ab10b327cb45b5cbaf2c4a7050cb34ed"},
+  {emoji:"🪫",sw:"余裕を失っている",type:"ガス欠の彼",
+   psych:"今の彼は恋愛以前に、生活や仕事でエネルギーが限界に近い状態です。あなたへの気持ちがなくなったのではなく、「余裕がない時期」にいるだけ。こういう時の男性は「何も求めてこない人」のそばにいたくなります。つまり今がチャンスです。",
+   todo:["連絡の量を少しだけ減らす。返信を急かさず「待てる存在」になることが最大の武器。","「ゆっくりしてね」の一言を送って、そっとしておく。それ以上は不要。","会えない時間を自分の充実に使う。あなたが楽しそうにしていることが彼を引き寄せる。"],
+   msg:"男性の「余裕がない時期」は必ず終わります。戻ってきた時に「追い詰めなかった人」のそばに男性は居続けます。今のあなたにできる最善は、彼を待ちながら自分の時間を楽しむこと。それが最も早く彼を引き寄せます💕",
+   label:"「余裕がない彼」が自分から戻ってくる待ち方・関わり方",url:"https://note.com/preview/nab1f01d76990?prev_access_key=2648c7d3e09fc97e6fec39bd8dd97a7b"},
+  {emoji:"🌀",sw:"刺激を求めている",type:"マンネリ中の彼",
+   psych:"今の彼は関係が安定しすぎて、少し刺激が足りていない状態です。あなたへの気持ちがないのではなく、「この関係のリスタート」が必要なサイン。マンネリは終わりではなく、次のステージへの入口です。",
+   todo:["いつもと違う自分を1つ見せる。話題・ファッション・誘い方、何か1つ変えるだけでOK。","彼に合わせすぎることをやめ、自分の意見や世界を出す。「知らない面がある」と感じさせる。","自分が楽しんでいる姿を見せる。あなたが輝いているほど彼の「手放したくない」本能が動く。"],
+   msg:"マンネリになるのは、関係が続いているから。続いていない関係にはマンネリすら起きません。大きなことをしなくていい。「いつもと1つ違う自分」を見せるだけで彼のスイッチは動き始めます💕",
+   label:"「マンネリの彼」のスイッチを入れ直す、最短ルート",url:"https://note.com/preview/nc4f33d4a458b?prev_access_key=785737d06a5c820f3f14ca70d7c212b2"}
+];
+
+var scores=[0,0,0,0], cur=0, sel=null;
+
+function g(id){return document.getElementById(id);}
+
+function show(id){g(id).style.display='block';}
+function hide(id){g(id).style.display='none';}
+
+function startQuiz(){
+  hide('start-screen');
+  show('quiz-screen');
+  renderQ();
+}
+
+function renderQ(){
+  sel=null;
+  var q=Qs[cur];
+  var pct=Math.round(cur/Qs.length*100);
+  g('q-counter').textContent='Q'+(cur+1)+' / '+Qs.length;
+  g('q-pct').textContent=pct+'%';
+  g('prog-fill').style.width=pct+'%';
+  g('q-num').textContent='QUESTION '+('0'+(cur+1)).slice(-2);
+  g('q-text').textContent=q.text;
+  var labels=['A','B','C','D'];
+  var c=g('opts'); c.innerHTML='';
+  q.opts.forEach(function(o,i){
+    var btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML='<span class="opt-lbl">'+labels[i]+'</span>'+o;
+    btn.addEventListener('click',function(){
+      var all=document.querySelectorAll('.opt');
+      for(var j=0;j<all.length;j++) all[j].classList.remove('sel');
+      btn.classList.add('sel');
+      sel=i;
+      var nb=g('btn-next');
+      nb.style.display='block';
+      nb.textContent=cur===Qs.length-1?'結果を見る 💕':'次の質問へ →';
+    });
+    c.appendChild(btn);
+  });
+  g('btn-next').style.display='none';
+  var card=g('q-card');
+  card.classList.remove('fu');
+  void card.offsetWidth;
+  card.classList.add('fu');
+}
+
+function nextQ(){
+  if(sel===null) return;
+  scores[sel]++;
+  cur++;
+  if(cur>=Qs.length) showResult();
+  else renderQ();
+}
+
+function showResult(){
+  hide('quiz-screen');
+  show('result-screen');
+  var max=0;
+  for(var i=1;i<scores.length;i++){if(scores[i]>scores[max]) max=i;}
+  var r=Rs[max];
+  g('r-emoji').textContent=r.emoji;
+  g('r-switch').textContent=r.sw;
+  g('r-type').textContent=r.type;
+  g('r-psychology').textContent=r.psych;
+  var ul=g('r-todo'); ul.innerHTML='';
+  r.todo.forEach(function(t,i){
+    var li=document.createElement('li');
+    li.innerHTML='<span class="todo-num">'+(i+1)+'</span><span>'+t+'</span>';
+    ul.appendChild(li);
+  });
+  g('r-msg').textContent=r.msg;
+  var ab=g('r-article-btn');
+  ab.href=r.url;
+  g('r-article-label').textContent=r.label;
+  var grid=g('type-grid'); grid.innerHTML='';
+  Rs.forEach(function(t,i){
+    var a=document.createElement('a');
+    a.href=t.url; a.target='_blank';
+    a.className='type-item'+(i===max?' current':'');
+    a.innerHTML='<span class="type-icon">'+t.emoji+'</span>'
+      +'<div class="type-body">'
+      +'<div class="type-name">'+t.type+(i===max?'<span class="cur-badge">あなた</span>':'')+'</div>'
+      +'<div class="type-sw">'+t.sw+'</div>'
+      +'<div class="type-action">→ '+t.label+'</div>'
+      +'</div>'
+      +'<span class="type-arr">›</span>';
+    grid.appendChild(a);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function retry(){
+  scores=[0,0,0,0]; cur=0; sel=null;
+  hide('result-screen');
+  show('quiz-screen');
+  renderQ();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// イベント登録（DOMContentLoaded後に確実に実行）
+document.addEventListener('DOMContentLoaded',function(){
+  g('start-btn').addEventListener('click', startQuiz);
+  g('btn-next').addEventListener('click', nextQ);
+  g('retry-btn').addEventListener('click', retry);
+});
+</script>
+</body>
+</html>
